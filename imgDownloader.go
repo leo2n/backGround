@@ -33,7 +33,7 @@ type ImgInfo struct {
 }
 
 func getImgInfo() *ImgInfo {
-	client := http.Client{Timeout: 5 * time.Second}
+	client := http.Client{Timeout: 30 * time.Second}
 	baseUrl := "https://wallpaper.wispx.cn/api/find"
 	request, err := http.NewRequest("GET", baseUrl, nil)
 	if err != nil {
@@ -85,7 +85,7 @@ func downloadImg() {
 	fName := "\""+imgName+"\"" + "." + imgExtendName
 	fName = strings.ReplaceAll(fName, " ", "-")
 	fmt.Println("fName: ",fName)
-	client := http.Client{Timeout: 30 * time.Second}
+	client := http.Client{Timeout: 60 * time.Second}
 	request, err := http.NewRequest("GET", imgURL, nil)
 	if err != nil {
 		log.Fatalln(err)
