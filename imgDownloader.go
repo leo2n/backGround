@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -71,20 +70,27 @@ func getImgInfo() *ImgInfo {
 
 // store img file in specfic directory
 func downloadImg() {
+	// If 'image' folder exists in current directory
+	currentDir, _ := os.Getwd()
+	if _, err := os.Stat(currentDir + "/image"); os.IsNotExist(err) {
+		os.MkdirAll(currentDir+"/image", 0777)
+	} else {
+		log.Printf("image folder exists")
+	}
 	img := getImgInfo()
 	imgURL := img.Url
 	imgName := img.WorksName
 	fmt.Println("imgName: ", imgName)
 	imgExtendName := (strings.Split(img.SaveName, "."))[len(strings.Split(img.SaveName, "."))-1]
-	if strings.Contains(imgExtendName, "&"){
+	if strings.Contains(imgExtendName, "&") {
 		imgExtendName = (strings.Split(imgExtendName, "&"))[0]
 	}
 	fmt.Println("extendName: ", imgExtendName)
-	fileName := uuid.New().String()
-	fileNamePlusExtend := fileName+"."+imgExtendName
-	fName := "\""+imgName+"\"" + "." + imgExtendName
-	fName = strings.ReplaceAll(fName, " ", "-")
-	fmt.Println("fName: ",fName)
+	//fileName := uuid.New().String()
+	//fileNamePlusExtend := fileName+"."+imgExtendName
+	fName := "\"" + imgName + "\"" + "." + imgExtendName
+	fName = strings.ReplaceAll(fName, "/", "-")
+	fmt.Println("fName: ", fName)
 	client := http.Client{Timeout: 60 * time.Second}
 	request, err := http.NewRequest("GET", imgURL, nil)
 	if err != nil {
@@ -108,12 +114,12 @@ func downloadImg() {
 		log.Fatalln(err)
 	}
 	// save img locally
-	currentDir, err := os.Getwd()
+	currentDir, err = os.Getwd()
 	fmt.Println("currentDir is:", currentDir)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	f, err := os.Create(currentDir + "/image/" + fileNamePlusExtend)
+	f, err := os.Create(currentDir + "/image/" + fName)
 	if err != nil {
 		log.Fatalln(err)
 	}
